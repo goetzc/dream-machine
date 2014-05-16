@@ -237,7 +237,7 @@ function stop() {
   //alert(1000 * (ccc/2) / ((new Date()).getTime()-Now) );
 }
 
-function playPause() {
+function playPause() {  // invoked by button 'playPause'
   if(!paused) {
     paused = true;
     clearInterval(i);
@@ -252,11 +252,26 @@ function playPause() {
   }
 }
 
-function restart() {  // To change frequency manually, invoked by 'Slower' and 'Faster'.
+function restart() {  // To change frequency manually, invoked by changeFreq()
   isMyDreamCycle = false;
   stop();
   start();
   document.getElementById("start").value = "Stop";
+  document.getElementById("info").style.display = 'none';
+  document.getElementById("cycleArea").style.visibility = 'hidden';
+}
+
+function changeFreq(change) {
+  if(change == 'slower') {
+    if(frequency > 1) frequency--; 
+    dispFreq(); 
+    restart();
+  }
+  if(change == 'faster') {
+    frequency++; 
+    dispFreq(); 
+    restart();
+  }
 }
 
 </script>
@@ -279,10 +294,10 @@ function restart() {  // To change frequency manually, invoked by 'Slower' and '
      </tr>
      <tr>
       <td>
-        <input type="button" onClick="if(frequency > 1) frequency--; dispFreq(); restart();" value="Slower"/>
+        <input type="button" onClick="changeFreq('slower')" value="Slower"/>
       </td>
       <td align="right">
-        <input type="button" onClick="frequency++; dispFreq(); restart();" value="Faster"/>
+        <input type="button" onClick="changeFreq('faster')" value="Faster"/>
       </td>
      </tr><tr><td><br/>
   <form name="colors">
