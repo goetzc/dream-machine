@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!-- Original code from: http://www.netliberty.net/dreamachine.html 
+TODO: fix up background colors. Calculate actual frequency, and report if too fast. When slow use gradual - auto calculate. -->
+<html><head>
+<title>Dream Machine</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<script language="JavaScript" type="text/javascript">
+
+var cur = 0;
+var frequency = 15;
+var active = false;
+var paused = false;
+var isMyDreamCycle = false;
+var colors = new Array();
+var i;
+var hD = "0123456789ABCDEF";
+var intTime;
+var cycle;
+var relativeTime = 1;
+var cycleNum = new Array();
+var totalTime = 0;
+var first = new Array();
+setColor(255, 255, 255, 0);
+
+function showHide(id, btnName, changeValue) {
+  var id = document.getElementById(id);
+
+  if(id.style.display != 'none') {
+    id.style.display = 'none';
+    if(changeValue == 'true') 
+      document.getElementById(btnName).value = 'Show';
+  }
+  else {
+    id.style.display = 'inline';
+    if(changeValue == 'true') 
+      document.getElementById(btnName).value = 'Hide';
+  }
+}
+
+function myDreamCycle() {  // button 'Start' calls this function.
+  if(!active) {
+    document.getElementById("start").value = "Stop";
+    document.getElementById("playPause").style.visibility = 'visible';
+    document.getElementById("cycleArea").style.visibility = 'visible';
+    document.getElementById("info").style.display = 'none';
+    intTime = setInterval(changeCycleHz, 1000);
+    isMyDreamCycle = true;
+    start();
+    cycle = 0;
+    frequency = 15;
+    dispFreq();
+    cycleNum[0] = 600/8;
+    cycleNum[1] = 1800/4;
+    cycleNum[2] = 600;
+    cycleNum[3] = 1800/4;
+    cycleNum[4] = 600/8;
+    first[0] = true;
+    first[1] = true;
+    first[2] = true;
+    first[3] = true;
+    first[4] = true;
+  }
+  else if(isMyDreamCycle == true) {
+    if(confirm("Are you sure you want to stop all the cycles? You wont be able to resume the cycle. Use «Pause cycle» if you intent to continue with this cycle later."))
+      end(); // TODO: setColor doens't work on pause.
+  }
+  else if(isMyDreamCycle == false)  // If not in isMyDreamCycle (e.g. contant frequency), don't show message and stop directly.
+    end();
+}
+
+function end() {
+  stop();
+  document.getElementById("start").value = "Start";
+  setColor(chosenColor[0], chosenColor[1], chosenColor[2], chosenColor[3]);  // on stop, screen should not stay black.
+}
+
+function changeCycleHz() {
+  totalTime++;
+  if(totalTime > 600 && totalTime <= 2400) cycle=1;        // 10 to 40 minutes (30).
+  else if(totalTime > 2400 && totalTime <= 3000) cycle=2;  // 40 to 50 minutes (10).
+  else if(totalTime > 3000 && totalTime <= 4800) cycle=3;  // 50 to 80 minutes (30).
+  else if(totalTime > 4800 && totalTime <= 5400) cycle=4;  // 80 to 90 minutes (10).
+  else if(totalTime > 5400) {
+    totalTime = 0;
+    cycle = 0;
+    first[0] = true;
+    first[1] = true;
+    first[2] = true;
+    first[3] = true;
+    first[4] = true;
+  }
+  var minutes = Math.floor(totalTime / 60);
+  var seconds = totalTime - (minutes * 60);
+  var minutesStr = "";
+  var secondsStr = "";
+  if(minutes < 10)
+    minutesStr = "0";
+  if(seconds < 10)
+    secondsStr = "0";
+  document.getElementById('time').value = minutesStr + minutes + ":" + secondsStr + seconds;
+  document.getElementById('cycle').value = (cycle + 1);
+  
+  switch(cycle) {
+    case 0:
+      if(first[0])
+        relativeTime = 1;
+      first[0] = false;
+      if(totalTime >= (cycleNum[0] * relativeTime)) {
+        frequency--;
+        dispFreq();
+        myRestart();
+      }
+      if(cycleNum[0] == (totalTime / relativeTime))
+        relativeTime++;
+      break;
+
+    case 1:
+      if(first[1]) 
+        relativeTime = 1;
+      first[1] = false;
+      if(totalTime >= (600 + (cycleNum[1] * relativeTime))) {
+        frequency--;
+        dispFreq();
+        myRestart();
+      }
+      if(cycleNum[1] == ((totalTime - 600) / relativeTime))
+        relativeTime++;
+      break;
+
+    case 2:
+      relativeTime = 1;
+      break;
+
+    case 3:
+      if(first[3]) 
+        relativeTime = 1;
+      first[3] = false;
+      if(totalTime >= (3000 + (cycleNum[3] * relativeTime))) {
+        frequency++;
+        dispFreq();
+        myRestart();
+      }
+      if(cycleNum[3] == ((totalTime - 3000) / relativeTime))
+        relativeTime++;
+      break;
+
+    case 4:
+      if(first[4]) 
+        relativeTime = 1;
+      first[4] = false;
+      if(totalTime >= (4800 + (cycleNum[4] * relativeTime))) {
+        frequency++;
+        dispFreq();
+        myRestart();
+      }
+      if(cycleNum[4] == ((totalTime - 4800) / relativeTime))
+        relativeTime++;
+      break;
+  }
+}
+
+function dispFreq() {
+  document.getElementById('freq').innerHTML = '&nbsp;' + frequency + ' Hz&nbsp;';
+}
+
+function d2h(d) {
+  var h = hD.substr(d&15,1);
+  while(d>15) 
+    {d>>=4; h=hD.substr(d&15,1)+h;}
+  if(h.length == 1) 
+    h = 0 + h; //pad to 2 chars
+  return h;
+}
+
+function h2d(h) {
+  return parseInt(h,16);
+}
+
+  //var chosenColor = [r, g, b, gradual]
+function setColor(r, g, b, gradual) {
+  chosenColor = [r, g, b, gradual]
+  clearInterval(i);
+  colors.length = 0;
+  colors.push('#000000');
+  for(i=1; i<=gradual; i++) {
+    colors.push('#' +
+                d2h(Math.round(i*r/(gradual+1))) +
+                d2h(Math.round(i*g/(gradual+1))) +
+                d2h(Math.round(i*b/(gradual+1)))
+               );
+  }
+  colors.push('#' + d2h(r) + d2h(g) + d2h(b));
+  document.bgColor = colors[colors.length-1];
+  for(i=gradual; i>=1; i--) {
+    colors.push('#' +
+                d2h(Math.round(i*r/(gradual+1))) +
+                d2h(Math.round(i*g/(gradual+1))) +
+                d2h(Math.round(i*b/(gradual+1)))
+               );
+  }
+  myRestart();
+}
+
+function myRestart() {
+  if(active) {
+    active = false;
+    clearInterval(i);
+    start();
+  }
+}
+
+var ccc=0;
+function swap() { 
+  ccc++;
+  document.bgColor = colors[cur];
+  cur++;
+  if(cur >= colors.length) 
+    cur = 0;
+}
+
+function start() {
+  //Now = (new Date()).getTime();
+  ccc = 0;
+    if(!active)
+      i = setInterval("swap()", Math.round(1000/frequency/colors.length));
+    active = true;
+}
+
+function stop() { 
+  active = false;
+  paused = false;
+  clearInterval(i);
+  clearInterval(intTime);
+  totalTime = 0;
+  document.getElementById("playPause").value = 'Pause cycle';
+  document.getElementById("playPause").style.visibility = 'hidden';
+  //alert(1000 * (ccc/2) / ((new Date()).getTime()-Now) );
+}
+
+function playPause() {
+  if(!paused) {
+    paused = true;
+    clearInterval(i);
+    clearInterval(intTime);
+    document.getElementById("playPause").value = 'Resume cycle';
+  }
+  else {
+    paused = false;
+    intTime = setInterval(changeCycleHz, 1000);
+    i = setInterval("swap()", Math.round(1000/frequency/colors.length));
+    document.getElementById("playPause").value = 'Pause cycle';
+  }
+}
+
+function restart() {  // To change frequency manually, invoked by 'Slower' and 'Faster'.
+  isMyDreamCycle = false;
+  stop();
+  start();
+  document.getElementById("start").value = "Stop";
+}
+
+</script>
+</head>
+
+<body>
+  <input type="button" id="btnHide" onClick="showHide('panel', 'btnHide', 'true');" value="Hide"/>
+  <div id="panel">
+    <table>
+     <tr>
+      <td>
+        <input id="start" type="button" onClick="myDreamCycle();" value="Start"/>
+      </td>
+      <td rowspan="2" align="center">
+        <span id="freq">&nbsp;15 Hz&nbsp;</span>
+      </td>
+      <td align="right">
+        <input id="playPause" type="button" onClick="playPause();" value="Pause cycle" style="visibility:hidden"/>
+      </td>
+     </tr>
+     <tr>
+      <td>
+        <input type="button" onClick="if(frequency > 1) frequency--; dispFreq(); restart();" value="Slower"/>
+      </td>
+      <td align="right">
+        <input type="button" onClick="frequency++; dispFreq(); restart();" value="Faster"/>
+      </td>
+     </tr><tr><td><br/>
+  <form name="colors">
+    <input type="button" style="background-color:White" onClick="setColor(255, 255, 255, 0);" value="   "/>
+    <input type="button" style="background-color:Red" onClick="setColor(255, 0, 0, 0);" value="   "/>
+    <input type="button" style="background-color:Yellow" onClick="setColor(255, 255, 0, 0);" value="   "/><br/>
+    <input type="button" style="background-color:Green" onClick="setColor(0, 255, 0, 0);" value="   "/>
+    <input type="button" style="background-color:Blue" onClick="setColor(0, 0, 255, 0);" value="   "/>
+    <input type="button" style="background-color:DarkViolet " onClick="setColor(148, 0, 211, 0);" value="   "/>
+  </form> 
+    </td></tr>
+    </table><br/>
+    Time: &nbsp;<input type="text" id="time" disabled="disabled" style="width:50px;text-align:right" value="00:00"/><br/>
+    <div id="cycleArea" style="visibility:hidden">
+      Cycle: <input type="text" id="cycle" disabled="disabled" style="width:50px;text-align:right" value="1"/><br/><br/>
+    </div>
+    
+    <input type="button" id="btnInfo" onClick="showHide('info', btnInfo, 'false');" value="Info"/><br/>
+    <div id="info">
+      <p>For a proper effect sit rather close to the screen, and <b>remember to close your eyes</b>.</p>
+      <p>Note: In some people, this can cause <a href="https://en.wikipedia.org/wiki/Photosensitive_epilepsy">photosensitive epilepsy</a>, depending on the frequency chosen.</p>
+      <p>More info about <a href="https://en.wikipedia.org/wiki/Dreamachine">Dreamachines</a>.</p>
+    </div>  
+  </div>
+</body>
+</html>
