@@ -22,18 +22,18 @@ var totalTime = 0;
 var first = new Array();
 setColor(255, 255, 255, 0);
 
-function showHide(id, btnName, changeValue) {
-  var id = document.getElementById(id);
+function showHide(hideElementId, btnId, changeValue) {
+  var hideElement = document.getElementById(hideElementId);
 
-  if(id.style.display != 'none') {
-    id.style.display = 'none';
-    if(changeValue == 'true') 
-      document.getElementById(btnName).value = 'Show';
+  if(hideElement.style.display != 'none') {
+    hideElement.style.display = 'none';
+    if(changeValue == 'true')
+      document.getElementById(btnId).value = 'Show';
   }
   else {
-    id.style.display = 'inline';
-    if(changeValue == 'true') 
-      document.getElementById(btnName).value = 'Hide';
+    hideElement.style.display = 'inline';
+    if(changeValue == 'true')
+      document.getElementById(btnId).value = 'Hide';
   }
 }
 
@@ -61,7 +61,7 @@ function myDreamCycle() {  // button 'Start' calls this function.
     first[4] = true;
   }
   else if(isMyDreamCycle == true) {
-    if(confirm("Are you sure you want to stop all the cycles? You wont be able to resume the cycle. Use «Pause cycle» if you intent to continue with this cycle later."))
+    if(confirm("Are you sure you want to stop all the cycles? \nYou wont be able to resume the cycle. Use «Pause cycle» if you intent to continue with this cycle later."))
       end(); // TODO: setColor doens't work on pause.
   }
   else if(isMyDreamCycle == false)  // If not in isMyDreamCycle (e.g. contant frequency), don't show message and stop directly.
@@ -71,7 +71,7 @@ function myDreamCycle() {  // button 'Start' calls this function.
 function end() {
   stop();
   document.getElementById("start").value = "Start";
-  setColor(chosenColor[0], chosenColor[1], chosenColor[2], chosenColor[3]);  // on stop, screen should not stay black.
+  setColor(chosenColor[0], chosenColor[1], chosenColor[2], chosenColor[3]);  // TODO: on stop, screen should not stay black.
 }
 
 function changeCycleHz() {
@@ -89,17 +89,10 @@ function changeCycleHz() {
     first[3] = true;
     first[4] = true;
   }
-  var minutes = Math.floor(totalTime / 60);
-  var seconds = totalTime - (minutes * 60);
-  var minutesStr = "";
-  var secondsStr = "";
-  if(minutes < 10)
-    minutesStr = "0";
-  if(seconds < 10)
-    secondsStr = "0";
-  document.getElementById('time').value = minutesStr + minutes + ":" + secondsStr + seconds;
+
+  updateTime();
   document.getElementById('cycle').value = (cycle + 1);
-  
+
   switch(cycle) {
     case 0:
       if(first[0])
@@ -157,6 +150,16 @@ function changeCycleHz() {
         relativeTime++;
       break;
   }
+}
+
+function updateTime() {
+  var minutes = Math.floor(totalTime / 60);
+  var seconds = totalTime - (minutes * 60);
+  var minutesStr = "";
+  var secondsStr = "";
+  if(minutes < 10) minutesStr = "0";
+  if(seconds < 10) secondsStr = "0";
+  document.getElementById('time').value = minutesStr + minutes + ":" + secondsStr + seconds;
 }
 
 function dispFreq() {
@@ -256,20 +259,22 @@ function restart() {  // To change frequency manually, invoked by changeFreq()
   isMyDreamCycle = false;
   stop();
   start();
+  dispFreq();
   document.getElementById("start").value = "Stop";
   document.getElementById("info").style.display = 'none';
   document.getElementById("cycleArea").style.visibility = 'hidden';
+  // TODO: continue the clock when isMyDreamCycle==false
+  //totalTime++;
+  //intTime = setInterval(updateTime, 1000);
 }
 
 function changeFreq(change) {
   if(change == 'slower') {
     if(frequency > 1) frequency--; 
-    dispFreq(); 
     restart();
   }
   if(change == 'faster') {
-    frequency++; 
-    dispFreq(); 
+    frequency++;
     restart();
   }
 }
@@ -278,7 +283,7 @@ function changeFreq(change) {
 </head>
 
 <body>
-  <input type="button" id="btnHide" onClick="showHide('panel', 'btnHide', 'true');" value="Hide"/>
+  <input type="button" id="btnHide" onClick="showHide('panel', this.id, 'true');" value="Hide"/>
   <div id="panel">
     <table>
      <tr>
@@ -306,7 +311,7 @@ function changeFreq(change) {
     <input type="button" style="background-color:Yellow" onClick="setColor(255, 255, 0, 0);" value="   "/><br/>
     <input type="button" style="background-color:Green" onClick="setColor(0, 255, 0, 0);" value="   "/>
     <input type="button" style="background-color:Blue" onClick="setColor(0, 0, 255, 0);" value="   "/>
-    <input type="button" style="background-color:DarkViolet " onClick="setColor(148, 0, 211, 0);" value="   "/>
+    <input type="button" style="background-color:DarkViolet" onClick="setColor(148, 0, 211, 0);" value="   "/>
   </form> 
     </td></tr>
     </table><br/>
@@ -315,7 +320,7 @@ function changeFreq(change) {
       Cycle: <input type="text" id="cycle" disabled="disabled" style="width:50px;text-align:right" value="1"/><br/><br/>
     </div>
     
-    <input type="button" id="btnInfo" onClick="showHide('info', btnInfo, 'false');" value="Info"/><br/>
+    <input type="button" id="btnInfo" onClick="showHide('info', this.id, 'false');" value="Info"/><br/>
     <div id="info">
       <p>For a proper effect sit rather close to the screen, and <b>remember to close your eyes</b>.</p>
       <p>Note: In some people, this can cause <a href="https://en.wikipedia.org/wiki/Photosensitive_epilepsy">photosensitive epilepsy</a>, depending on the frequency chosen.</p>
