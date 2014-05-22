@@ -7,7 +7,7 @@ TODO: fix up background colors. Calculate actual frequency, and report if too fa
 </head>
 
 <body>
-<input type="button" id="btnHide" onClick="showHide('panel-div', this.id, 'true');" value="Hide"/>
+<input type="button" id="btnHide" onClick="showHide('panel-div', this.id, 'Show', 'Hide');" value="Hide"/>
 <div id="panel-div">
   <table border="0">
     <tr>
@@ -48,11 +48,11 @@ TODO: fix up background colors. Calculate actual frequency, and report if too fa
       </td>
     </tr>
   </table><br/>
-  <input type="button" id="btnChart" value="Chart" onClick="showHide('canvas-div', this.id, 'false');"/><br/>
+  <input type="button" id="btnChart" value="Chart" onClick="showHide('canvas-div', this.id, '', '');"/><br/>
   <div id="canvas-div" style="display:none">
-    <canvas id="lineChartCanvas" width="300" height="150" style="border:1px solid #d3d3d3;"></canvas><br/>
+    <canvas id="lineChartCanvas" width="301" height="150"></canvas><br/>
   </div>
-  <input type="button" id="btnInfo" onClick="showHide('info-div', this.id, 'false');" value="Info"/><br/>
+  <input type="button" id="btnInfo" onClick="showHide('info-div', this.id, '', '');" value="Info"/><br/>
   <div id="info-div">
     <p>For a proper effect sit rather close to the screen, and <b>remember to close your eyes</b>.</p>
     <p>Note: In some people, this can cause <a href="https://en.wikipedia.org/wiki/Photosensitive_epilepsy">photosensitive epilepsy</a>, depending on the frequency chosen.</p>
@@ -66,34 +66,34 @@ var frequency = 15;
 var active = false;
 var paused = false;
 var isMyDreamCycle = false;
-var colors = new Array();
+var colors = [];
 var i;
 var hD = "0123456789ABCDEF";
 var intTime;
 var cycle;
 var relativeTime = 1;
-var cycleNum = new Array();
+var cycleNum = [];
 var cycleTime = 0;
-var first = new Array();
+var first = [];
 setColor(255, 255, 255, 0);
 
-function showHide(hideElementId, btnId, changeValue) {  // Invoked by buttons 'Hide', 'Chart' and 'Info'.
+function showHide(hideElementId, btnId, text1, text2) {  // Invoked by buttons 'Hide', 'Chart' and 'Info'.
   var hideElement = document.getElementById(hideElementId);
 
-  if(hideElement.style.display == 'none') {
+  if (hideElement.style.display == 'none')
     hideElement.style.display = 'inline';
-    if(changeValue == 'true')
-      document.getElementById(btnId).value = 'Hide';
-  }
-  else {
+  else
     hideElement.style.display = 'none';
-    if(changeValue == 'true')
-      document.getElementById(btnId).value = 'Show';
-  }
+
+  if (text1 == '') return  // Don't change text (value)
+  else if (text1 == document.getElementById(btnId).value)
+    document.getElementById(btnId).value = text2;
+  else
+    document.getElementById(btnId).value = text1;
 }
 
 function myDreamCycle() {  // Invoked by button 'Start' | 'Stop'
-  if(!active) {
+  if (!active) {
     document.getElementById("start").value = "Stop";
     document.getElementById("playPause").style.visibility = 'visible';
     document.getElementById("cycle-div").style.visibility = 'visible';
@@ -116,11 +116,11 @@ function myDreamCycle() {  // Invoked by button 'Start' | 'Stop'
     first[3] = true;
     first[4] = true;
   }
-  else if(isMyDreamCycle == true) {
-    if(confirm("Are you sure you want to stop all the cycles? \nYou wont be able to resume the cycle. Use «Pause cycle» if you intent to continue with this cycle later."))
+  else if (isMyDreamCycle) {
+    if (confirm("Are you sure you want to stop all the cycles? \nYou wont be able to resume the cycle. Use «Pause cycle» if you intent to continue with this cycle later."))
       end(); // TODO: setColor doens't work on pause.
   }
-  else if(isMyDreamCycle == false)  // If not in isMyDreamCycle (e.g. contant frequency), don't show message and stop directly.
+  else if (!isMyDreamCycle)  // If not in isMyDreamCycle (e.g. contant frequency), don't show message and stop directly.
     end();
 }
 
@@ -132,11 +132,11 @@ function end() {  // Invoked by myDreamCycle()
 
 function changeCycleHz() {
   cycleTime++;                                             //  0 to 10 minutes (10).
-  if(cycleTime > 600 && cycleTime <= 2400) cycle=1;        // 10 to 40 minutes (30).
-  else if(cycleTime > 2400 && cycleTime <= 3000) cycle=2;  // 40 to 50 minutes (10).
-  else if(cycleTime > 3000 && cycleTime <= 4800) cycle=3;  // 50 to 80 minutes (30).
-  else if(cycleTime > 4800 && cycleTime <= 5400) cycle=4;  // 80 to 90 minutes (10).
-  else if(cycleTime > 5400) {
+  if (cycleTime > 600 && cycleTime <= 2400) cycle=1;        // 10 to 40 minutes (30).
+  else if (cycleTime > 2400 && cycleTime <= 3000) cycle=2;  // 40 to 50 minutes (10).
+  else if (cycleTime > 3000 && cycleTime <= 4800) cycle=3;  // 50 to 80 minutes (30).
+  else if (cycleTime > 4800 && cycleTime <= 5400) cycle=4;  // 80 to 90 minutes (10).
+  else if (cycleTime > 5400) {
     cycleTime = 0;
     cycle = 0;
     first[0] = true;
@@ -151,28 +151,28 @@ function changeCycleHz() {
 
   switch(cycle) {
     case 0:
-      if(first[0])
+      if (first[0])
         relativeTime = 1;
       first[0] = false;
-      if(cycleTime >= (cycleNum[0] * relativeTime)) {
+      if (cycleTime >= (cycleNum[0] * relativeTime)) {
         frequency--;
         dispFreq();
         restart();
       }
-      if(cycleNum[0] == (cycleTime / relativeTime))
+      if (cycleNum[0] == (cycleTime / relativeTime))
         relativeTime++;
       break;
 
     case 1:
-      if(first[1]) 
+      if (first[1]) 
         relativeTime = 1;
       first[1] = false;
-      if(cycleTime >= (600 + (cycleNum[1] * relativeTime))) {
+      if (cycleTime >= (600 + (cycleNum[1] * relativeTime))) {
         frequency--;
         dispFreq();
         restart();
       }
-      if(cycleNum[1] == ((cycleTime - 600) / relativeTime))
+      if (cycleNum[1] == ((cycleTime - 600) / relativeTime))
         relativeTime++;
       break;
 
@@ -181,28 +181,28 @@ function changeCycleHz() {
       break;
 
     case 3:
-      if(first[3]) 
+      if (first[3]) 
         relativeTime = 1;
       first[3] = false;
-      if(cycleTime >= (3000 + (cycleNum[3] * relativeTime))) {
+      if (cycleTime >= (3000 + (cycleNum[3] * relativeTime))) {
         frequency++;
         dispFreq();
         restart();
       }
-      if(cycleNum[3] == ((cycleTime - 3000) / relativeTime))
+      if (cycleNum[3] == ((cycleTime - 3000) / relativeTime))
         relativeTime++;
       break;
 
     case 4:
-      if(first[4]) 
+      if (first[4]) 
         relativeTime = 1;
       first[4] = false;
-      if(cycleTime >= (4800 + (cycleNum[4] * relativeTime))) {
+      if (cycleTime >= (4800 + (cycleNum[4] * relativeTime))) {
         frequency++;
         dispFreq();
         restart();
       }
-      if(cycleNum[4] == ((cycleTime - 4800) / relativeTime))
+      if (cycleNum[4] == ((cycleTime - 4800) / relativeTime))
         relativeTime++;
       break;
   }
@@ -213,8 +213,8 @@ function updateTime() {  // Invoked by changeCycleHz()
   var seconds = cycleTime - (minutes * 60);
   var minutesStr = "";
   var secondsStr = "";
-  if(minutes < 10) minutesStr = "0";
-  if(seconds < 10) secondsStr = "0";
+  if (minutes < 10) minutesStr = "0";
+  if (seconds < 10) secondsStr = "0";
   document.getElementById('time').value = minutesStr + minutes + ":" + secondsStr + seconds;
 }
 
@@ -226,7 +226,7 @@ function d2h(d) {
   var h = hD.substr(d&15,1);
   while(d>15) 
     {d>>=4; h=hD.substr(d&15,1)+h;}
-  if(h.length == 1) 
+  if (h.length == 1) 
     h = 0 + h; //pad to 2 chars
   return h;
 }
@@ -236,7 +236,7 @@ function h2d(h) {
 }
 
 function setColor(r, g, b, gradual) {
-  chosenColor = [r, g, b, gradual]
+  chosenColor = [r, g, b, gradual];
   clearInterval(i);
   colors.length = 0;
   colors.push('#000000');
@@ -264,12 +264,12 @@ function swap() {  // Swaps screen colors
   ccc++;
   document.bgColor = colors[cur];
   cur++;
-  if(cur >= colors.length) 
+  if (cur >= colors.length) 
     cur = 0;
 }
 
 function restart() {
-  if(active) {
+  if (active) {
     active = false;
     clearInterval(i);
     start();
@@ -279,8 +279,8 @@ function restart() {
 function start() {  // Invoked by myDreamCycle(), restartFreq(), restart()
   //Now = (new Date()).getTime();
   ccc = 0;
-    if(!active)
-      i = setInterval("swap()", Math.round(1000/frequency/colors.length));
+    if (!active)
+      i = setInterval(swap, Math.round(1000/frequency/colors.length));
     active = true;
 }
 
@@ -296,7 +296,7 @@ function stop() {  // Invoked by restartFreq(), end()
 }
 
 function playPause() {  // invoked by button 'playPause'
-  if(!paused) {
+  if (!paused) {
     paused = true;
     clearInterval(i);
     clearInterval(intTime);
@@ -305,8 +305,19 @@ function playPause() {  // invoked by button 'playPause'
   else {
     paused = false;
     intTime = setInterval(changeCycleHz, 1000);
-    i = setInterval("swap()", Math.round(1000/frequency/colors.length));
+    i = setInterval(swap, Math.round(1000/frequency/colors.length));
     document.getElementById("playPause").value = 'Pause cycle';
+  }
+}
+
+function changeFreq(change) {  // Invoked by buttons 'Slower' & 'Faster'
+  if (change == 'slower') {
+    if (frequency > 1) frequency--; 
+    restartFreq();
+  }
+  if (change == 'faster') {
+    frequency++;
+    restartFreq();
   }
 }
 
@@ -317,57 +328,61 @@ function restartFreq() {  // Invoked by changeFreq()
   dispFreq();
   document.getElementById("start").value = "Stop";
   document.getElementById("cycle-div").style.visibility = 'hidden';
+  document.getElementById("canvas-div").style.display = 'inline';
   document.getElementById("info-div").style.display = 'none';
   // TODO: continue the clock when isMyDreamCycle==false
   //cycleTime++;  totalTime?
   //intTime = setInterval(updateTime, 1000);
 }
 
-function changeFreq(change) {  // Invoked by buttons 'Slower' & 'Faster'
-  if(change == 'slower') {
-    if(frequency > 1) frequency--; 
-    restartFreq();
-  }
-  if(change == 'faster') {
-    frequency++;
-    restartFreq();
-  }
-}
-
+// Chart canvas
 var canvas = document.getElementById("lineChartCanvas");
 var ctx = canvas.getContext("2d");  // Coord orig (0,0) top-left.
-ctx.save()
-// Background
-ctx.fillStyle = "AntiqueWhite";
-ctx.fillRect(10, 0, canvas.width-10, canvas.height-10);
-// x & y axis
-ctx.strokeStyle = "black"
-ctx.lineWidth = 2;
-ctx.moveTo(0, canvas.height-10);  // x-axis
-ctx.lineTo(canvas.width, canvas.height-10);
-ctx.moveTo(10, 0);                // y-axis
-ctx.lineTo(10, canvas.height);
-ctx.stroke();
-// Axis labels
-ctx.fillStyle = "black"
+ctx.save();
+
+function grid(gridSize, gap) {
+  ctx.strokeStyle = '#d3d3d3';
+  
+  // x-axis, horizontal
+  for(var i=0; i<canvas.height-5; i+=gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(10, i);
+    ctx.lineTo(canvas.width, i);
+    ctx.lineWidth = (i % gap === 0) ? 1 : 0.5;
+    ctx.stroke();
+  }
+  // y-axis, vertical
+  for(var j=10; j<canvas.width; j+=gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(j, 0);
+    ctx.lineTo(j, canvas.height-10);
+    ctx.lineWidth = (j % gap === 0) ? 1 : 0.5;
+    ctx.stroke();
+  }
+}
+grid(5, 50);
+
+// axis labels
+ctx.fillStyle = "black";
 ctx.textAlign = "center";
 ctx.fillText("Time", canvas.width/2, canvas.height);
 ctx.textAlign = "start";
 ctx.rotate(-Math.PI/2);
 ctx.fillText("Frequency", -100, 8);
-ctx.restore()
+ctx.restore();
 
 var totalTime = 0;
 setInterval(lineChart, 20000);  // 20 seconds
 
 function lineChart() {
-  if(totalTime <= canvas.width && active && !paused) {
+  if (totalTime <= canvas.width && active && !paused) {
     totalTime++;
+    
     // add dots, considering axis margins (TODO: scale 2x)
-    ctx.fillStyle = "red";
-    ctx.fillRect(totalTime+10, canvas.height-11-frequency, 1, 2);
+    ctx.fillStyle = 'brown';
+    ctx.fillRect(totalTime+10, canvas.height-11-frequency, 1, 1);
   }
-  else if(totalTime > canvas.width) totalTime = 0;
+  else if (totalTime > canvas.width) totalTime = 0;
 }
 
 </script>
