@@ -75,9 +75,12 @@ var relativeTime = 1;
 var cycleNum = [];
 var cycleTime = 0;
 var first = [];
+var hiddenByUser = false;
 setColor(255, 255, 255, 0);
 
 function showHide(hideElementId, btnId, text1, text2) {  // Invoked by buttons 'Hide', 'Chart' and 'Info'.
+  hiddenByUser = true;  // Doesn't matter if later it's unhidden.
+
   var hideElement = document.getElementById(hideElementId);
 
   if (hideElement.style.display == 'none')
@@ -311,8 +314,8 @@ function playPause() {  // invoked by button 'playPause'
 }
 
 function changeFreq(change) {  // Invoked by buttons 'Slower' & 'Faster'
-  if (change == 'slower') {
-    if (frequency > 1) frequency--; 
+  if (change == 'slower' && frequency > 1) {
+    frequency--; 
     restartFreq();
   }
   if (change == 'faster') {
@@ -328,7 +331,8 @@ function restartFreq() {  // Invoked by changeFreq()
   dispFreq();
   document.getElementById("start").value = "Stop";
   document.getElementById("cycle-div").style.visibility = 'hidden';
-  document.getElementById("canvas-div").style.display = 'inline';
+  if (hiddenByUser == false) {
+    document.getElementById("canvas-div").style.display = 'inline';}
   document.getElementById("info-div").style.display = 'none';
   // TODO: continue the clock when isMyDreamCycle==false
   //cycleTime++;  totalTime?
