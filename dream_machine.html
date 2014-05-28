@@ -5,10 +5,9 @@ TODO: fix up background colors. Calculate actual frequency, and report if too fa
 <title>Dream Machine</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 </head>
-
 <body>
-<input type="button" id="btnHide" onClick="showHide('panel-div', this.id, 'Show', 'Hide');" value="Hide"/>
-<div id="panel-div">
+<input type="button" id="btnHide" onClick="showHide('panel_div', this.id, 'Show', 'Hide');" value="Hide"/>
+<div id="panel_div">
   <table border="0">
     <tr>
       <td>
@@ -42,25 +41,25 @@ TODO: fix up background colors. Calculate actual frequency, and report if too fa
     <tr>
       <td colspan="3"><br/>
 	Time: &nbsp;<input type="text" id="time" disabled="disabled" style="width:50px;text-align:right" value="00:00"/><br/>
-	<div id="cycle-div" style="visibility:hidden">
+	<div id="cycle_div" style="visibility:hidden">
 	  Cycle: <input type="text" id="cycle" disabled="disabled" style="width:50px;text-align:right" value="0"/><br/>
 	</div>
       </td>
     </tr>
   </table><br/>
-  <input type="button" id="btnChart" value="Chart" onClick="showHide('canvas-div', this.id, '', '');"/><br/>
-  <div id="canvas-div" style="display:none">
+  <input type="button" id="btnChart" value="Chart" onClick="showHide('canvas_div', this.id, '', '');"/><br/>
+  <div id="canvas_div" style="display:none">
     <canvas id="lineChartCanvas" width="301" height="150"></canvas><br/>
   </div>
-  <input type="button" id="btnInfo" onClick="showHide('info-div', this.id, '', '');" value="Info"/><br/>
-  <div id="info-div">
+  <input type="button" id="btnInfo" onClick="showHide('info_div', this.id, '', '');" value="Info"/><br/>
+  <div id="info_div">
     <p>For a proper effect sit rather close to the screen, and <b>remember to close your eyes</b>.</p>
     <p>Note: In some people, this can cause <a href="https://en.wikipedia.org/wiki/Photosensitive_epilepsy">photosensitive epilepsy</a>, depending on the frequency chosen.</p>
     <p>More info about <a href="https://en.wikipedia.org/wiki/Dreamachine">Dreamachines</a>.</p>
   </div>
 </div>
-
 <script language="JavaScript" type="text/javascript">
+
 var cur = 0;
 var frequency = 15;
 var active = false;
@@ -99,9 +98,9 @@ function myDreamCycle() {  // Invoked by button 'Start' | 'Stop'
   if (!active) {
     document.getElementById("start").value = "Stop";
     document.getElementById("playPause").style.visibility = 'visible';
-    document.getElementById("cycle-div").style.visibility = 'visible';
-    document.getElementById("canvas-div").style.display = 'inline';
-    document.getElementById("info-div").style.display = 'none';
+    document.getElementById("cycle_div").style.visibility = 'visible';
+    document.getElementById("canvas_div").style.display = 'inline';
+    document.getElementById("info_div").style.display = 'none';
     intTime = setInterval(changeCycleHz, 1000);
     isMyDreamCycle = true;
     start();
@@ -330,10 +329,10 @@ function restartFreq() {  // Invoked by changeFreq()
   start();
   dispFreq();
   document.getElementById("start").value = "Stop";
-  document.getElementById("cycle-div").style.visibility = 'hidden';
+  document.getElementById("cycle_div").style.visibility = 'hidden';
   if (hiddenByUser == false) {
-    document.getElementById("canvas-div").style.display = 'inline';}
-  document.getElementById("info-div").style.display = 'none';
+    document.getElementById("canvas_div").style.display = 'inline';}
+  document.getElementById("info_div").style.display = 'none';
   // TODO: continue the clock when isMyDreamCycle==false
   //cycleTime++;  totalTime?
   //intTime = setInterval(updateTime, 1000);
@@ -344,7 +343,7 @@ var canvas = document.getElementById("lineChartCanvas");
 var ctx = canvas.getContext("2d");  // Coord orig (0,0) top-left.
 ctx.save();
 
-function grid(gridSize, gap) {
+function drawGrid(gridSize, gap) {
   ctx.strokeStyle = '#d3d3d3';
   
   // x-axis, horizontal
@@ -364,7 +363,7 @@ function grid(gridSize, gap) {
     ctx.stroke();
   }
 }
-grid(5, 50);
+drawGrid(5, 50);
 
 // axis labels
 ctx.fillStyle = "black";
