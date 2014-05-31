@@ -338,13 +338,13 @@ function restartFreq() {  // Invoked by changeFreq()
   //intTime = setInterval(updateTime, 1000);
 }
 
-// Chart canvas
+// Chart
 var canvas = document.getElementById("lineChartCanvas");
 var ctx = canvas.getContext("2d");  // Coord orig (0,0) top-left.
 ctx.save();
 
 function drawGrid(gridSize, gap) {
-  ctx.strokeStyle = '#d3d3d3';
+  ctx.strokeStyle = '#aaa';
   
   // x-axis, horizontal
   for(var i=0; i<canvas.height-5; i+=gridSize) {
@@ -374,18 +374,18 @@ ctx.rotate(-Math.PI/2);
 ctx.fillText("Frequency", -100, 8);
 ctx.restore();
 
-var totalTime = 0;
+var chartRelTime = 10;
 setInterval(lineChart, 20000);  // 20 seconds
 
 function lineChart() {
-  if (totalTime <= canvas.width && active && !paused) {
-    totalTime++;
+  if (chartRelTime <= canvas.width && active && !paused) {
+    chartRelTime++;
     
-    // add dots, considering axis margins (TODO: scale 2x)
+    // Add dots, considering axis margins and scale 2x
     ctx.fillStyle = 'brown';
-    ctx.fillRect(totalTime+10, canvas.height-11-frequency, 1, 1);
+    ctx.fillRect(chartRelTime, canvas.height-10 - 2*frequency, 1, 2);
   }
-  else if (totalTime > canvas.width) totalTime = 0;
+  else if (chartRelTime > canvas.width) chartRelTime = 10;
 }
 
 </script>
