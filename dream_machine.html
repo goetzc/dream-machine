@@ -30,11 +30,11 @@ TODO: fix up background colors. Calculate actual frequency, and report if too fa
     </tr>
     <tr><td colspan="3"><br/>
       <form name="colors">
-	<input type="button" style="background-color:White" onClick="setColor(255, 255, 255, 0);" value="   "/>
-	<input type="button" style="background-color:Red" onClick="setColor(255, 0, 0, 0);" value="   "/>
-	<input type="button" style="background-color:Yellow" onClick="setColor(255, 255, 0, 0);" value="   "/>
-	<input type="button" style="background-color:Green" onClick="setColor(0, 255, 0, 0);" value="   "/>
-	<input type="button" style="background-color:Blue" onClick="setColor(0, 0, 255, 0);" value="   "/>
+	<input type="button" style="background-color:White"  onClick="setColor(255, 255, 255, 0);" value="   "/>
+	<input type="button" style="background-color:Red"    onClick="setColor(255, 0, 0, 0);"     value="   "/>
+	<input type="button" style="background-color:Yellow" onClick="setColor(255, 255, 0, 0);"   value="   "/>
+	<input type="button" style="background-color:Green"  onClick="setColor(0, 255, 0, 0);"     value="   "/>
+	<input type="button" style="background-color:Blue"   onClick="setColor(0, 0, 255, 0);"     value="   "/>
 	<input type="button" style="background-color:DarkViolet" onClick="setColor(148, 0, 211, 0);" value="   "/>
       </form> 
     </td></tr>
@@ -242,7 +242,7 @@ function setColor(r, g, b, gradual) {
   clearInterval(i);
   colors.length = 0;
   colors.push('#000000');
-  for(i=1; i<=gradual; i++) {
+  for (i=1; i<=gradual; i++) {
     colors.push('#' +
                 d2h(Math.round(i*r/(gradual+1))) +
                 d2h(Math.round(i*g/(gradual+1))) +
@@ -251,7 +251,7 @@ function setColor(r, g, b, gradual) {
   }
   colors.push('#' + d2h(r) + d2h(g) + d2h(b));
   document.bgColor = colors[colors.length-1];
-  for(i=gradual; i>=1; i--) {
+  for (i=gradual; i>=1; i--) {
     colors.push('#' +
                 d2h(Math.round(i*r/(gradual+1))) +
                 d2h(Math.round(i*g/(gradual+1))) +
@@ -347,7 +347,7 @@ function drawGrid(gridSize, gap) {
   ctx.strokeStyle = '#aaa';
   
   // x-axis, horizontal
-  for(var i=0; i<canvas.height-5; i+=gridSize) {
+  for (var i=0; i<canvas.height-5; i+=gridSize) {
     ctx.beginPath();
     ctx.moveTo(10, i);
     ctx.lineTo(canvas.width, i);
@@ -355,7 +355,7 @@ function drawGrid(gridSize, gap) {
     ctx.stroke();
   }
   // y-axis, vertical
-  for(var j=10; j<canvas.width; j+=gridSize) {
+  for (var j=10; j<canvas.width; j+=gridSize) {
     ctx.beginPath();
     ctx.moveTo(j, 0);
     ctx.lineTo(j, canvas.height-10);
